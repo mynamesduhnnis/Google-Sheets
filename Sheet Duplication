@@ -1,0 +1,47 @@
+//
+I've been using the following code in a schedule type invioronment. 
+The code will look at "Template" as the base for the duplication. 
+Then it will create sheets based on the Sheet "Sheet Data". 
+So essentially, "Sheet Data" raneg A:A I have dates set for the month. 
+Once you run the code you'll duplicate the "Template" however many times (in this case dates) you have in "Sheet Data".
+It will then rename the created sheets to the value in A:A of "Sheet Data".
+//
+
+function duplicateSheets() {
+  // Get the active spreadsheet
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+
+  // Get the sheet that contains the data for the new sheets
+  var dataSheet = spreadsheet.getSheetByName("Sheet Data");
+
+  // Get the range of data in column A
+  var dataRange = dataSheet.getRange("A2:A");
+
+  // Get the values in column A
+  var dataValues = dataRange.getValues();
+
+  // Get the template sheet
+  var templateSheet = spreadsheet.getSheetByName("Template");
+
+  // Iterate through the data values
+  for (var i = 0; i < dataValues.length; i++) {
+    // Get the current data value
+    var dataValue = dataValues[i][0];
+
+    // Check if the data value is not empty
+    if (dataValue != "") {
+      // Duplicate the template sheet
+      var newSheet = templateSheet.copyTo(spreadsheet);
+
+      // Rename the new sheet
+      newSheet.setName(dataValue);
+
+      // Get the range for cell C4 on the new sheet
+      var sheetNameCell = newSheet.getRange("C4");
+
+      // Set the value of cell C4 to the sheet name
+      sheetNameCell.setValue(newSheet.getName());
+    }
+  }
+}
+
