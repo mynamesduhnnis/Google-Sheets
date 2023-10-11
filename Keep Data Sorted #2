@@ -1,0 +1,47 @@
+//
+This is a second version of the data sort code from another GH user. 
+This is a code I wrote out with the help of AI. 
+It works for the purpose I have intended for it. May help someone else. 
+Be sure to read through the code and make any necessary changes before applying it to your sheet.
+//
+
+function onOpen() {
+  var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+  for (var i = 0; i < sheets.length; i++) {
+    sortSheet(sheets[i]);
+  }
+}
+
+function onEdit() {
+  var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+  for (var i = 0; i < sheets.length; i++) {
+    sortSheet(sheets[i]);
+  }
+}
+
+function sortSheet(sheet) {
+  var lastRow = sheet.getLastRow();
+  
+  var range = sheet.getRange('A13:M' + lastRow);
+  range.sort({column: 13, ascending: true});
+
+  var values = range.getValues();
+  
+  var rowsRE = [];
+  var rowsC = [];
+  var rowsOther = [];
+
+  for (var i = 0; i < values.length; i++) {
+    if (values[i][10] == 'C') {
+      rowsC.push(values[i]);
+    } else if (values[i][10] == 'RE') {
+      rowsRE.push(values[i]);
+    } else {
+      rowsOther.push(values[i]);
+    }
+  }
+
+  var finalRows = rowsOther.concat(rowsRE, rowsC);
+
+  range.setValues(finalRows);
+}
