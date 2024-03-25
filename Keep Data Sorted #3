@@ -1,0 +1,114 @@
+/**This version of the Keep Data Soreted code was revised 03/25/2024*/
+
+/**
+ * This Google Sheets script automatically keeps data in a specified column sorted
+ * every time the data changes. It watches for cell edits and triggers the sorting
+ * function accordingly.
+ *
+ * Google Sheets does not provide a native way to auto-sort a column, especially
+ * when you want to maintain this functionality without creating a separate view
+ * sheet or using complex formulas. This script fills that gap by sorting your data
+ * in real-time based on your preferences.
+ *
+ * Installation:
+ *   1. Open your Google Sheet.
+ *   2. Navigate to Tools > Script editor…
+ *   3. Copy and paste this script in the editor.
+ *   4. Modify the three constants at the start of the code to match your setup:
+ *      - `SORT_COLUMN_INDEX`: The numeric index of the column to keep auto-sorted
+ *                              (e.g., A = 1, B = 2, etc.).
+ *      - `ASCENDING`: Set to `true` for ascending order, `false` for descending.
+ *      - `NUMBER_OF_HEADER_ROWS`: If your sheet has header rows, specify how many
+ *                                 to exclude them from the auto-sort.
+ *   5. Save the script with a name (e.g., "Auto Sort Script").
+ *
+ * Usage:
+ *   Edit your Google Sheet as usual. Whenever you make changes to the specified
+ *   sort column (defined in `SORT_COLUMN_INDEX`), the script will automatically
+ *   re-sort your rows.
+ *
+ *   If you encounter issues:
+ *     1. Reload your spreadsheet.
+ *     2. Open the script editor (Tools > Script editor…), select `onInstall`,
+ *        and click Debug (the bug icon) to ensure proper initialization.
+ *     3. If problems persist, seek help through GitHub or Google Apps Script
+ *        communities for solutions.
+ *
+ * Author: Dennis Acevedo (@mynamesduhnnis)
+ * GitHub: https://github.com/yourusername/your-repo
+ *
+ * @OnlyCurrentDoc Limits the script to only accessing the current spreadsheet.
+ */
+
+// The numeric index of the column you wish to keep auto-sorted. A = 1, B = 2,
+// and so on.
+const SORT_COLUMN_INDEX = 12;
+// Whether to sort the data in ascending (true) or descending (false) order.
+const ASCENDING = true;
+// If you have header rows in your sheet, specify how many to exclude them from
+// the auto-sort.
+const NUMBER_OF_HEADER_ROWS = 6;
+
+// No need to edit anything below this line for general use.
+// Make an improvement? Let me know on GitHub!
+
+// Keep track of the active sheet.
+let activeSheet;
+
+/**
+ * Automatically sorts the specified column in the given sheet.
+ *
+ * @param {Sheet} sheet The sheet to sort.
+ */
+function autoSort(sheet) {
+  if (!sheet) {
+    console.error("Sheet is undefined in autoSort function");
+    return;
+  }
+
+  let range = sheet.getDataRange();
+
+  if (NUMBER_OF_HEADER_ROWS > 0) {
+    range = range.offset(NUMBER_OF_HEADER_ROWS, 0);
+  }
+
+  range.sort({
+    column: SORT_COLUMN_INDEX,
+    ascending: ASCENDING
+  });
+}
+
+/**
+ * Triggers when a sheet is edited, and calls the auto-sort function if the
+ * edited cell is in the column we're looking to sort.
+ *
+ * @param {Object} event The triggering event.
+ */
+function onEdit(event) {
+  const editedCell = event.range;
+  const sheet = editedCell.getSheet();
+
+  if (editedCell.getColumn() == SORT_COLUMN_INDEX) {
+    autoSort(sheet);
+  }
+}
+
+/**
+ * Runs when the sheet is opened.
+ *
+ * @param {Object} event The triggering event.
+ */
+function onOpen(event) {
+  activeSheet = SpreadsheetApp.getActiveSheet();
+  autoSort(activeSheet);
+}
+
+/**
+ * Runs when the add-on is installed; calls onOpen() to ensure any initialization
+ * work is done immediately.
+ *
+ * @param {Object} event The triggering event.
+ */
+function onInstall(event) {
+  onOpen(event);
+}
